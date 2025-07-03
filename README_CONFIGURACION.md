@@ -55,7 +55,7 @@ python test_backend.py tu-backend.railway.app
 
 ## 📋 Próximos Pasos
 
-1. **Aloja el backend** en Railway/Render/Heroku
+1. **Aloja el backend** en Render (recomendado)
 2. **Actualiza config.js** con la URL real
 3. **Despliega en Netlify**
 4. **Prueba la funcionalidad** de generar llaves

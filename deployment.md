@@ -10,24 +10,25 @@ Tu backend Python (`bracket_generator.py`) necesita ser alojado en un servicio c
 - **Heroku**
 - **PythonAnywhere**
 
-### 🚂 Opción 1: Railway (Recomendado)
+### 🚂 Opción 1: Render (Recomendado)
 
-1. **Crear cuenta en Railway**:
-   - Ve a [railway.app](https://railway.app)
+1. **Crear cuenta en Render**:
+   - Ve a [render.com](https://render.com)
    - Crea una cuenta gratuita
 
-2. **Crear un nuevo proyecto**:
-   - Click en "New Project"
+2. **Crear un nuevo Web Service**:
+   - Click en "New +" → "Web Service"
    - Selecciona "Deploy from GitHub repo"
    - Conecta tu repositorio
 
 3. **Configurar el proyecto**:
-   - Railway detectará automáticamente que es un proyecto Python
-   - Asegúrate de que tienes `requirements.txt` en tu repo
+   - Render detectará automáticamente que es un proyecto Python
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `gunicorn bracket_generator:app`
    - El puerto se configurará automáticamente
 
 4. **Obtener la URL**:
-   - Una vez desplegado, obtendrás una URL como: `https://tu-proyecto.railway.app`
+   - Una vez desplegado, obtendrás una URL como: `https://tu-proyecto.onrender.com`
 
 ### 🔧 Paso 2: Configurar el Frontend
 
@@ -35,7 +36,7 @@ Tu backend Python (`bracket_generator.py`) necesita ser alojado en un servicio c
    ```javascript
    this.API_ENDPOINTS = {
        development: 'http://localhost:5500',
-       production: 'https://tu-proyecto.railway.app' // ⭐ Cambia esta URL
+       production: 'https://tu-proyecto.onrender.com' // ⭐ Cambia esta URL
    };
    ```
 
@@ -106,11 +107,11 @@ mexxus_arena/
 
 ### 📝 Ejemplo de Configuración Completa
 
-1. **Backend en Railway**: `https://mexxus-arena-backend.railway.app`
+1. **Backend en Render**: `https://mexxus-arena-backend.onrender.com`
 2. **Frontend en Netlify**: `https://mexxus-arena.netlify.app`
 3. **config.js**:
    ```javascript
-   production: 'https://mexxus-arena-backend.railway.app'
+   production: 'https://mexxus-arena-backend.onrender.com'
    ```
 
 ### 🆘 Comandos Útiles
@@ -120,7 +121,7 @@ mexxus_arena/
 python test_backend.py
 
 # Probar backend en producción
-python test_backend.py mexxus-arena-backend.railway.app
+python test_backend.py mexxus-arena-backend.onrender.com
 
 # Iniciar backend local
 python start_backend.py

@@ -11,7 +11,7 @@ class Config {
         // URLs del backend
         this.API_ENDPOINTS = {
             development: 'http://localhost:5500',
-            production: 'https://mexxusarena.netlify.app' // Cambiar por tu URL de producción
+            production: 'https://mexxus-arena-backend.onrender.com' // Cambiar por tu URL de producción
         };
         
         // URL base del API
