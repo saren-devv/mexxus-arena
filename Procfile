@@ -1,0 +1,1 @@
+web: python bracket_generator.py 

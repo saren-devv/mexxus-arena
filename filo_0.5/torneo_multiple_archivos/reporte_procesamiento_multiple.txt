@@ -1,0 +1,19 @@
+🥋 REPORTE DE PROCESAMIENTO MÚLTIPLE - TAEKWONDO 🥋
+============================================================
+
+📅 Fecha de procesamiento: 2025-07-03 15:18:07
+📂 Carpeta de salida: torneo_multiple_archivos
+
+📊 PROCESAMIENTO COMBINADO
+------------------------------
+Total participantes: 249
+Participantes solos: 70
+Participantes en llaves: 179
+Archivos procesados: 1
+Categorías generadas: 129
+
+Distribución por archivo origen:
+  • lista_match_prueba:
+    - Total: 249 participantes
+    - Solos: 70 participantes
+    - En llaves: 179 participantes

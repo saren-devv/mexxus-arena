@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MEXXUS ARENA - Gestión de Eventos</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="A2.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Suisse+Intl:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <!-- XLSX Library -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+    <!-- App Scripts -->
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="events.js"></script>
+    <script src="admin.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <!-- Botón Mi Perfil (izquierda) -->
+            <button id="perfilBtn" class="perfil-btn hidden">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                </svg>
+                <span>Mi Perfil</span>
+            </button>
+            
+            <!-- Logo (centro) -->
+            <div class="logo">
+                <img src="mexxus_arena_logo.png" alt="MEXXUS ARENA" class="logo-image">
+            </div>
+            
+            <!-- Botón hamburguesa (solo visible en móvil) -->
+            <button id="hamburgerBtn" class="hamburger-btn">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
+            <!-- Navegación desktop -->
+            <nav class="nav">
+                <button id="loginBtn" class="nav-btn">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z"/>
+                    </svg>
+                    Iniciar Sesión
+                </button>
+                <button id="registerBtn" class="nav-btn">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/>
+                    </svg>
+                    Registrar Delegación
+                </button>
+                <span id="userInfo" class="user-info hidden"></span>
+                <button id="logoutBtn" class="nav-btn hidden">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/>
+                    </svg>
+                    Cerrar Sesión
+                </button>
+            </nav>
+            
+            <!-- Menú móvil -->
+            <div id="mobileMenu" class="mobile-menu">
+                <div class="mobile-menu-content">
+                    <!-- Logo en menú móvil -->
+                    <div class="mobile-menu-logo">
+                        <img src="mexxus_arena_logo.png" alt="MEXXUS ARENA" class="mobile-logo-image">
+                    </div>
+                    <div id="mobileUserInfo" class="mobile-user-info hidden"></div>
+                    <button id="mobileLoginBtn" class="mobile-nav-btn">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M10,17V14H3V10H10V7L15,12L10,17M10,2H19A2,2 0 0,1 21,4V20A2,2 0 0,1 19,22H10A2,2 0 0,1 8,20V18H10V20H19V4H10V6H8V4A2,2 0 0,1 10,2Z"/>
+                        </svg>
+                        Iniciar Sesión
+                    </button>
+                    <button id="mobileRegisterBtn" class="mobile-nav-btn">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/>
+                        </svg>
+                        Registrar Delegación
+                    </button>
+                    <button id="mobileLogoutBtn" class="mobile-nav-btn hidden">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/>
+                        </svg>
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Página Principal -->
+    <main id="homePage" class="page active">
+        <!-- Sección de Eventos Públicos -->
+        <section class="public-events-section">
+            <div class="container">
+                <h2>
+                    <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
+                    </svg>
+                    Próximos Eventos y Competencias
+                </h2>
+                <p class="events-subtitle">Descubre los eventos deportivos más emocionantes organizados por MEXXUS ARENA</p>
+                
+                <div id="eventosPublicos" class="eventos-publicos-grid">
+                    <div class="loading-spinner">
+                        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z">
+                                <animateTransform attributeName="transform" type="rotate" dur="1s" values="0 12 12;360 12 12" repeatCount="indefinite"/>
+                            </path>
+                        </svg>
+                        Cargando eventos...
+                    </div>
+                </div>
+
+
+            </div>
+        </section>
+        </main>
+
+    <!-- Modal de Login -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>
+                <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                    <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                </svg>
+                Acceso de Delegaciones
+            </h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email o Abreviatura de la delegación:</label>
+                    <input type="text" id="loginEmail" placeholder="ejemplo@correo.com o TKDZAR" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Contraseña:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+            </form>
+            <div class="admin-login">
+                <p>¿No tienes cuenta? <button onclick="document.getElementById('loginModal').style.display='none'; document.getElementById('registerModal').style.display='flex';" class="btn-link">Registra tu delegación aquí</button></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>
+                <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                    <path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/>
+                </svg>
+                Registrar mi delegación
+            </h2>
+            <form id="registerForm">
+                <div class="register-form-grid">
+                    <!-- Columna izquierda - Datos de la delegación -->
+                    <div class="register-column">
+                        <h4 class="column-title">Datos de la Delegación</h4>
+                        <div class="form-group">
+                            <label for="registerNombre">Nombre de la delegación:</label>
+                            <input type="text" id="registerNombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerAbreviatura">Abreviatura:</label>
+                            <input type="text" id="registerAbreviatura" maxlength="10" placeholder="Ej: TKDZAR" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerTelefono">Teléfono (opcional):</label>
+                            <input type="tel" id="registerTelefono" placeholder="999-999-999">
+                        </div>
+                        <div class="form-group">
+                            <label for="registerEmail">Email (opcional):</label>
+                            <input type="email" id="registerEmail" placeholder="delegacion@ejemplo.com">
+                        </div>
+                    </div>
+
+                    <!-- Columna derecha - Datos del representante y acceso -->
+                    <div class="register-column">
+                        <h4 class="column-title">Representante y Acceso</h4>
+                        <div class="form-group">
+                            <label for="registerRepresentante">Nombre del representante:</label>
+                            <input type="text" id="registerRepresentante" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerDniRepresentante">DNI del representante:</label>
+                            <input type="text" id="registerDniRepresentante" pattern="[0-9]{8}" maxlength="8" placeholder="12345678" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerPassword">Contraseña:</label>
+                            <input type="password" id="registerPassword" minlength="6" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="registerConfirmPassword">Confirmar contraseña:</label>
+                            <input type="password" id="registerConfirmPassword" minlength="6" required>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="register-submit">
+                    <button type="submit" class="btn btn-primary">Registrar Delegación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard de Academia -->
+    <div id="academiaDashboard" class="page">
+        <div class="container">
+            <div class="text-center">
+                <h2 class="section-title">
+                    Panel de Delegación
+                </h2>
+                <p class="events-subtitle">Gestiona tus inscripciones y eventos deportivos en MEXXUS ARENA</p>
+            </div>
+            
+            <div class="dashboard-section">
+                <h3>
+                    <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                        <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
+                    </svg>
+                    Competencias Disponibles
+                </h3>
+                <div id="eventosDisponibles" class="eventos-publicos-grid">
+                    <!-- Los eventos se cargarán aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Inscripción -->
+    <div id="panelInscripcion" class="page">
+        <div class="container">
+            <div class="panel-inscripcion-header">
+                <h2>
+                    <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19M16.5,16L13.5,19L10.5,16M7.5,8L10.5,5L13.5,8H7.5Z"/>
+                    </svg>
+                    Panel de Inscripción
+                </h2>
+                <p class="panel-subtitle">Gestiona las inscripciones de tus alumnos para el evento en el que deseas participar.</p>
+            </div>
+
+            <div class="evento-inscripcion-info">
+                <div class="evento-card-inscripcion">
+                    <div class="evento-header-inscripcion">
+                        <div id="eventoImagenInscripcion" class="evento-imagen-inscripcion">
+                            <!-- La imagen del evento se cargará aquí -->
+                        </div>
+                        <div class="evento-detalles-inscripcion">
+                            <h3 id="eventoNombreInscripcion">Nombre del Evento</h3>
+                            <div class="evento-meta-inscripcion">
+                                <div class="meta-item">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"/>
+                                    </svg>
+                                    <span id="eventoFechaInscripcion">Fecha del evento</span>
+                                </div>
+                                <div class="meta-item">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22S19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                                    </svg>
+                                    <span id="eventoLugarInscripcion">Lugar del evento</span>
+                                </div>
+                                <div class="meta-item">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                                    </svg>
+                                    <span>Fecha límite: <span id="eventoFechaLimiteInscripcion">Fecha límite</span></span>
+                                </div>
+                                <div class="meta-item">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M16,4C16.88,4 17.67,4.38 18.18,5L20.5,2.68L21.32,3.5L19,5.82C19.62,6.33 20,7.12 20,8V16C20,18.21 18.21,20 16,20H8C5.79,20 4,18.21 4,16V8C4,5.79 5.79,4 8,4H16M16,6H8C6.9,6 6,6.9 6,8V16C6,17.1 6.9,18 8,18H16C17.1,18 18,17.1 18,16V8C18,6.9 17.1,6 16,6Z"/>
+                                    </svg>
+                                    <span id="eventoModalidadInscripcion">Modalidad</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="evento-descripcion-inscripcion">
+                        <h4>Descripción del Evento</h4>
+                        <p id="eventoDescripcionInscripcion">Descripción del evento...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección de Alumnos Inscritos -->
+            <div id="alumnosInscritosSection" class="alumnos-inscritos-section" style="display: none;">
+                <div class="section-header-inscripcion">
+                    <h3>
+                        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16,4C16.88,4 17.67,4.38 18.18,5L20.5,2.68L21.32,3.5L19,5.82C19.62,6.33 20,7.12 20,8V16C20,18.21 18.21,20 16,20H8C5.79,20 4,18.21 4,16V8C4,5.79 5.79,4 8,4H16M16,6H8C6.9,6 6,6.9 6,8V16C6,17.1 6.9,18 8,18H16C17.1,18 18,17.1 18,16V8C18,6.9 17.1,6 16,6Z"/>
+                        </svg>
+                        Mis Alumnos Inscritos en este Evento
+                    </h3>
+                    <span id="totalAlumnosInscritos" class="total-inscritos">0 alumnos inscritos</span>
+                </div>
+                
+                <div class="tabla-alumnos-container">
+                    <div class="participantes-tabla-container">
+                        <table class="participantes-tabla">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>DNI</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>Fecha de Nacimiento</th>
+                                    <th>Peso</th>
+                                    <th>GRADO KUP/DAN</th>
+                                    <th>Género</th>
+                                    <th>Modalidad</th>
+                                    <th>Academia (Abreviación)</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaAlumnosInscritos">
+                                <!-- Los alumnos inscritos se cargarán aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-acciones">
+                <div class="accion-card">
+                    <div class="accion-icon">
+                        <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/>
+                        </svg>
+                    </div>
+                    <div class="accion-content">
+                        <h3>Inscribir Alumnos</h3>
+                        <p>Registra a tus alumnos para participar en este evento. Puedes inscribir múltiples alumnos a la vez.</p>
+                        <button id="btnInscribirAlumnos" class="btn btn-primary btn-lg">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/>
+                            </svg>
+                            Inscribir Alumnos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="accion-card">
+                    <div class="accion-icon">
+                        <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                        </svg>
+                    </div>
+                    <div class="accion-content">
+                        <h3>Volver al Dashboard</h3>
+                        <p>Regresa a tu panel principal para ver todos los eventos disponibles y gestionar tu delegación.</p>
+                        <button id="btnVolverDashboard" class="btn btn-secondary btn-lg">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                            </svg>
+                            Volver al Dashboard
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalles del Evento -->
+    <div id="detallesEvento" class="page">
+        <div class="container">
+            <div class="detalles-evento-header">
+                <button id="btnVolverAdmin" class="btn btn-secondary">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                    </svg>
+                    Volver al Panel de Admin
+                </button>
+                <h2 id="detallesEventoTitulo">
+                    <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
+                    </svg>
+                    Detalles del Evento
+                </h2>
+            </div>
+
+            <!-- Bloque principal del evento -->
+            <div class="evento-detalles-completo">
+                <div class="evento-contenido-principal">
+                    <!-- Imagen principal del evento -->
+                    <div class="evento-imagen-principal">
+                        <div id="eventoImagenPrincipal" class="imagen-container">
+                            <!-- La imagen se cargará aquí -->
+                        </div>
+                    </div>
+
+                    <!-- Información del evento -->
+                    <div class="evento-info-card">
+                        <div class="evento-info-header">
+                            <h3 id="eventoNombreDetalle">Nombre del Evento</h3>
+                            <div class="evento-estado">
+                                <span id="eventoEstadoDetalle" class="estado-badge">Próximo</span>
+                            </div>
+                        </div>
+
+                        <div class="evento-info-grid">
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"/>
+                                    </svg>
+                                </div>
+                                <div class="info-content">
+                                    <span class="info-label">Fecha del Evento</span>
+                                    <span id="eventoFechaDetalle" class="info-value">--</span>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                                    </svg>
+                                </div>
+                                <div class="info-content">
+                                    <span class="info-label">Fecha Límite de Inscripción</span>
+                                    <span id="eventoFechaLimiteDetalle" class="info-value">--</span>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22S19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                                    </svg>
+                                </div>
+                                <div class="info-content">
+                                    <span class="info-label">Lugar</span>
+                                    <span id="eventoLugarDetalle" class="info-value">--</span>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M16,4C16.88,4 17.67,4.38 18.18,5L20.5,2.68L21.32,3.5L19,5.82C19.62,6.33 20,7.12 20,8V16C20,18.21 18.21,20 16,20H8C5.79,20 4,18.21 4,16V8C4,5.79 5.79,4 8,4H16M16,6H8C6.9,6 6,6.9 6,8V16C6,17.1 6.9,18 8,18H16C17.1,18 18,17.1 18,16V8C18,6.9 17.1,6 16,6Z"/>
+                                    </svg>
+                                </div>
+                                <div class="info-content">
+                                    <span class="info-label">Modalidad</span>
+                                    <span id="eventoModalidadDetalle" class="info-value">--</span>
+                                </div>
+                            </div>
+
+                            <div class="info-item full-width">
+                                <div class="info-icon">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/>
+                                    </svg>
+                                </div>
+                                <div class="info-content">
+                                    <span class="info-label">Inscripciones</span>
+                                    <span id="eventoInscripcionesDetalle" class="info-value">0 participantes inscritos</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="evento-descripcion-detalle">
+                            <h4>Descripción del Evento</h4>
+                            <p id="eventoDescripcionDetalle">--</p>
+                        </div>
+                        
+                        <!-- Botones de gestión del evento en la parte superior -->
+                        <div class="evento-admin-actions-top" style="display: flex; gap: 1rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--color-gray-200);">
+                            <button id="btnEditarEventoDetalle" class="btn btn-primary">
+                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+                                </svg>
+                                Editar Evento
+                            </button>
+                            <button id="btnEliminarEventoDetalle" class="btn btn-danger">
+                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                                </svg>
+                                Eliminar Evento
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sistema de pestañas para gestión del evento -->
+                <div class="evento-gestion-tabs">
+                    <div class="admin-tabs">
+                        <button class="tab-btn active" data-tab="inscripciones">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/>
+                            </svg>
+                            Inscripciones
+                        </button>
+                        <button class="tab-btn" data-tab="llaves">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M21,11L14,4L10,8L16,14L13,17H9V21H13L21,13V11M7,2V8H1V10H7V16H1V18H7V22H9V18H15V16H9V10H15V8H9V2H7Z"/>
+                            </svg>
+                            Llaves de Combate
+                        </button>
+                        <button class="tab-btn" data-tab="configuracion">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.98C19.47,12.66 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11.02L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.65 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11.02C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.66 4.57,12.98L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.98Z"/>
+                            </svg>
+                            Configuración
+                        </button>
+                    </div>
+
+                    <!-- Contenido de las pestañas -->
+                    <div class="tab-content active" id="tab-inscripciones">
+                        <div class="inscripciones-gestion">
+                            <div class="inscripciones-header">
+                                <h3>
+                                    <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/>
+                                    </svg>
+                                    Gestión de Inscripciones
+                                </h3>
+                                <div class="inscripciones-actions">
+                                    <button id="btnCerrarInscripciones" class="btn btn-warning">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11H16V16H8V11H9.2V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.4,8.7 10.4,10V11H13.6V10C13.6,8.7 12.8,8.2 12,8.2Z"/>
+                                        </svg>
+                                        Cerrar Inscripciones
+                                    </button>
+                                    <button id="btnExportarInscritos" class="btn btn-gold" onclick="window.adminManager.exportarInscripciones(window.adminManager.currentEventoId)">
+                                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                        </svg>
+                                        Exportar Lista
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="inscripciones-stats">
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="stat-content">
+                                        <h4 id="totalParticipantes">0</h4>
+                                        <p>Total Participantes</p>
+                                    </div>
+                                </div>
+
+                                <div class="stat-card">
+                                    <div class="stat-icon">
+                                        <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="stat-content">
+                                        <h4 id="totalAcademias">0</h4>
+                                        <p>Academias Inscritas</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="inscripciones-tabla-container">
+                                <table class="participantes-tabla" id="tablaInscripciones">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>DNI</th>
+                                            <th>Nombres</th>
+                                            <th>Apellidos</th>
+                                            <th>Fecha de Nacimiento</th>
+                                            <th>Peso</th>
+                                            <th>GRADO KUP/DAN</th>
+                                            <th>Género</th>
+                                            <th>Modalidad</th>
+                                            <th>Academia (Abreviación)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inscripcionesTableBody">
+                                        <!-- Los participantes se cargarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-llaves" class="tab-content">
+                        <div class="llaves-evento">
+                            <div class="llaves-header">
+                                <h3>
+                                    <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M21,11L14,4L10,8L16,14L13,17H9V21H13L21,13V11M7,2V8H1V10H7V16H1V18H7V22H9V18H15V16H9V10H15V8H9V2H7Z"/>
+                                    </svg>
+                                    Llaves de Combate del Evento
+                                </h3>
+                            </div>
+
+                            <div id="contenidoLlaves">
+                                <div class="llaves-upload-container">
+                                    <form id="llavesUploadForm" enctype="multipart/form-data">
+                                        <div id="llavesDropZone" class="llaves-drop-zone">
+                                            <div class="llaves-drop-zone-icon">📄</div>
+                                            <div class="llaves-drop-zone-text">
+                                                <strong>Arrastra y suelta tu archivo Excel aquí</strong>
+                                                <br>o<br>
+                                                <span style="color: var(--color-gold);">Haz clic para seleccionar</span>
+                                            </div>
+                                            <input type="file" name="participants" accept=".xls,.xlsx" class="llaves-file-input" id="llavesFileInput" required>
+                                        </div>
+                                        <div id="llavesSelectedFile" class="llaves-selected-file">
+                                            <span class="llaves-selected-file-icon">📎</span>
+                                            <span class="llaves-selected-file-name"></span>
+                                            <button type="button" class="llaves-remove-file" title="Eliminar archivo">
+                                                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary llaves-submit-btn" id="llavesSubmitBtn">
+                                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M19,3H5C3.89,3 3,3.89 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5C21,3.89 20.1,3 19,3M19,5V19H5V5H19Z"/>
+                                    </svg>
+                                    Generar Llaves
+                                </button>
+                                    </form>
+                            </div>
+
+                                <!-- Loading overlay for llaves -->
+                                <div class="llaves-loading-overlay" id="llavesLoadingOverlay">
+                                    <div class="llaves-loading-spinner"></div>
+                                    <p>Generando llaves...</p>
+                                </div>
+
+                                <!-- Success overlay for llaves -->
+                                <div class="llaves-success-overlay" id="llavesSuccessOverlay">
+                                    <div class="llaves-success-icon">✨</div>
+                                    <h4 class="llaves-success-message">¡Brackets Generados Exitosamente!</h4>
+                                    <p class="llaves-success-details">Los archivos han sido generados y se están descargando automáticamente.</p>
+                                    <button class="btn btn-primary llaves-new-upload-btn" onclick="window.adminManager.resetLlavesForm()">Generar Nuevos Brackets</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-content" id="tab-configuracion">
+                        <div class="configuracion-evento">
+                            <div class="configuracion-header">
+                                <h3>
+                                    <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.98C19.47,12.66 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11.02L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.65 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11.02C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.66 4.57,12.98L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.98Z"/>
+                                    </svg>
+                                    Configuración del Evento
+                                </h3>
+                            </div>
+
+                            <div class="configuracion-grid">
+                                <div class="config-section">
+                                    <h4>
+                                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11H16V16H8V11H9.2V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.4,8.7 10.4,10V11H13.6V10C13.6,8.7 12.8,8.2 12,8.2Z"/>
+                                        </svg>
+                                        Estado de Inscripciones
+                                    </h4>
+                                    <div class="config-options">
+                                        <label class="switch">
+                                            <input type="checkbox" id="inscripcionesAbiertas" checked>
+                                            <span class="slider"></span>
+                                            <span class="switch-label">Inscripciones Abiertas</span>
+                                        </label>
+                                        <p class="config-description">
+                                            Cuando está desactivado, no se permitirán nuevas inscripciones al evento.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="config-section">
+                                    <h4>
+                                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22S19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                                        </svg>
+                                        Visibilidad del Evento
+                                    </h4>
+                                    <div class="config-options">
+                                        <label class="switch">
+                                            <input type="checkbox" id="eventoPublico" checked>
+                                            <span class="slider"></span>
+                                            <span class="switch-label">Evento Público</span>
+                                        </label>
+                                        <p class="config-description">
+                                            Cuando está activado, el evento será visible en la página pública.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="config-section">
+                                    <h4>
+                                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                        </svg>
+                                        Documentos y Certificados
+                                    </h4>
+                                    <div class="config-actions">
+                                        <button id="btnGenerarCertificados" class="btn btn-gold">
+                                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                            </svg>
+                                            Generar Certificados
+                                        </button>
+                                        <button id="btnExportarReporte" class="btn btn-primary">
+                                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                                            </svg>
+                                            Exportar Reporte Completo
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="config-section danger-zone">
+                                    <h4>
+                                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M12,2L13.09,8.26L20,9L13.09,9.74L12,16L10.91,9.74L4,9L10.91,8.26L12,2M12.79,15.63L15.67,14.33L16.67,17.21L14.33,18.21L12.79,15.63M8.33,17.21L9.33,14.33L12.21,15.63L10.67,18.21L8.33,17.21M12,13.4L8.93,12.07L12,8.93L15.07,12.07L12,13.4Z"/>
+                                        </svg>
+                                        Zona de Peligro
+                                    </h4>
+                                    <div class="config-actions">
+                                        <button id="btnReiniciarEvento" class="btn btn-warning">
+                                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z"/>
+                                            </svg>
+                                            Reiniciar Inscripciones
+                                        </button>
+                                        <button id="btnEliminarEventoConfig" class="btn btn-danger">
+                                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
+                                            </svg>
+                                            Eliminar Evento
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Perfil de Delegación -->
+    <div id="perfilDelegacion" class="page">
+        <div class="container">
+            <div class="perfil-header">
+                <h2>
+                    <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                    </svg>
+                    Mi Perfil de Delegación
+                </h2>
+                <button id="btnVolverDashboardPerfil" class="btn btn-secondary">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"/>
+                    </svg>
+                    Volver al Dashboard
+                </button>
+            </div>
+
+            <!-- Información de la delegación -->
+            <div class="perfil-info-section">
+                <h3>
+                    <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                    </svg>
+                    Información de la Delegación
+                </h3>
+                <div class="perfil-info-grid">
+                    <div class="info-card">
+                        <div class="info-item">
+                            <label>Nombre de la Delegación:</label>
+                            <input type="text" id="perfilNombre" class="info-input" disabled>
+                        </div>
+                        <div class="info-item">
+                            <label>Abreviatura:</label>
+                            <input type="text" id="perfilAbreviatura" class="info-input" maxlength="10" disabled>
+                        </div>
+                        <div class="info-item">
+                            <label>Teléfono:</label>
+                            <input type="tel" id="perfilTelefono" class="info-input" disabled>
+                        </div>
+                        <div class="info-item">
+                            <label>Email:</label>
+                            <input type="email" id="perfilEmail" class="info-input" disabled>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-item">
+                            <label>Representante:</label>
+                            <input type="text" id="perfilRepresentante" class="info-input" disabled>
+                        </div>
+                        <div class="info-item">
+                            <label>DNI del Representante:</label>
+                            <input type="text" id="perfilDniRepresentante" class="info-input" maxlength="8" disabled>
+                        </div>
+                        <div class="info-item">
+                            <label>Fecha de Registro:</label>
+                            <input type="text" id="perfilFechaRegistro" class="info-input" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="perfil-actions">
+                    <button id="btnEditarPerfil" class="btn btn-primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+                        </svg>
+                        Editar Información
+                    </button>
+                    <button id="btnGuardarPerfil" class="btn btn-success hidden">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/>
+                        </svg>
+                        Guardar Cambios
+                    </button>
+                    <button id="btnCancelarPerfil" class="btn btn-secondary hidden">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                        </svg>
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal de Registro de Atleta -->
+            <div id="registroAtletaModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2>
+                            <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                                <path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/>
+                            </svg>
+                            Registrar Nuevo Atleta
+                        </h2>
+                        <button id="btnImportarDB" class="btn btn-secondary">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,12L16,16H13.5V19H10.5V16H8L12,12Z"/>
+                            </svg>
+                            IMPORTAR MI BASE DE DATOS
+                        </button>
+                    </div>
+                    <form id="registroAtletaForm">
+                        <div class="register-form-grid">
+                            <!-- Datos del Atleta -->
+                            <div class="register-column">
+                                <h4 class="column-title">Datos del Atleta</h4>
+                                <div class="form-group">
+                                    <label for="atletaNombres">Nombres:</label>
+                                    <input type="text" id="atletaNombres" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="atletaApellidos">Apellidos:</label>
+                                    <input type="text" id="atletaApellidos" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="atletaDni">Documento de Identidad:</label>
+                                    <input type="text" id="atletaDni" pattern="[0-9]{8}" maxlength="8" placeholder="12345678" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="atletaFechaNacimiento">Fecha de Nacimiento:</label>
+                                    <input type="date" id="atletaFechaNacimiento" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="atletaSexo">Sexo:</label>
+                                    <select id="atletaSexo" required>
+                                        <option value="">Seleccionar sexo...</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="register-submit">
+                            <button type="submit" class="btn btn-primary">Registrar Atleta</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+            <!-- Tabla de atletas -->
+            <div class="atletas-section">
+                <div class="section-header">
+                    <h3>
+                        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16,4C16.88,4 17.67,4.38 18.18,5L20.5,2.68L21.32,3.5L19,5.82C19.62,6.33 20,7.12 20,8V16C20,18.21 18.21,20 16,20H8C5.79,20 4,18.21 4,16V8C4,5.79 5.79,4 8,4H16M16,6H8C6.9,6 6,6.9 6,8V16C6,17.1 6.9,18 8,18H16C17.1,18 18,17.1 18,16V8C18,6.9 17.1,6 16,6Z"/>
+                        </svg>
+                        Mis Atletas
+                        <span id="totalAtletas" class="total-count">(0)</span>
+                    </h3>
+                    <button id="btnAgregarAtleta" class="btn btn-primary">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/>
+                        </svg>
+                        Agregar Mis Atletas
+                    </button>
+                </div>
+
+                <div class="tabla-alumnos-container">
+                    <div class="participantes-tabla-container">
+                        <table class="participantes-tabla">
+                            <thead>
+                                <tr>
+                                    <th>N°</th>
+                                    <th>Nombres</th>
+                                    <th>Apellidos</th>
+                                    <th>DNI</th>
+                                    <th>Fecha Nac.</th>
+                                    <th>Sexo</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="atletasTableBody">
+                                <tr class="no-atletas">
+                                    <td colspan="7" class="text-center">
+                                        <div class="empty-state">
+                                            <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M15,14C12.33,14 7,15.33 7,18V20H23V18C23,15.33 17.67,14 15,14M6,10V7H4V10H1V12H4V15H6V12H9V10M15,12A4,4 0 0,0 19,8A4,4 0 0,0 15,4A4,4 0 0,0 11,8A4,4 0 0,0 15,12Z"/>
+                                            </svg>
+                                            <p>No hay atletas registrados</p>
+                                            <p class="text-muted">Agrega atletas para poder inscribirlos en eventos</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Administrador -->
+    <div id="adminPanel" class="page">
+        <div class="container">
+            <h2>Panel de Administrador</h2>
+            
+            <div class="admin-tabs">
+                <button class="tab-btn active" data-tab="eventos">Eventos</button>
+                <button class="tab-btn" data-tab="academias">Delegaciones</button>
+                <button class="tab-btn" data-tab="perfil">Mi Perfil</button>
+            </div>
+
+            <!-- Tab de Eventos -->
+            <div id="eventosTab" class="tab-content active">
+                <div class="section-header">
+                    <h3>Gestionar Eventos</h3>
+                    <button id="crearEventoBtn" class="btn btn-primary">Crear Evento</button>
+                </div>
+                <div id="listaEventos" class="eventos-admin">
+                    <!-- Los eventos se cargarán aquí -->
+                </div>
+            </div>
+
+            <!-- Tab de Academias -->
+            <div id="academiasTab" class="tab-content">
+                <h3>Delegaciones Registradas</h3>
+                <div id="listaAcademias">
+                    <!-- Las academias se cargarán aquí -->
+                </div>
+            </div>
+
+            <!-- Tab de Mi Perfil -->
+            <div id="perfilTab" class="tab-content">
+                <div class="perfil-admin-section">
+                    <h3>
+                        <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,4A4,4 0 0,1 16,8A4,4 0 0,1 12,12A4,4 0 0,1 8,8A4,4 0 0,1 12,4M12,14C16.42,14 20,15.79 20,18V20H4V18C4,15.79 7.58,14 12,14Z"/>
+                        </svg>
+                        Mi Perfil de Administrador
+                    </h3>
+                    
+                    <div class="perfil-info-grid">
+                        <div class="info-card">
+                            <div class="info-item">
+                                <label>Nombre:</label>
+                                <input type="text" id="adminPerfilNombre" class="info-input" disabled>
+                            </div>
+                            <div class="info-item">
+                                <label>Email:</label>
+                                <input type="email" id="adminPerfilEmail" class="info-input" disabled>
+                            </div>
+                            <div class="info-item">
+                                <label>Tipo de Usuario:</label>
+                                <input type="text" id="adminPerfilTipo" class="info-input" value="Administrador" readonly>
+                            </div>
+                            <div class="info-item">
+                                <label>Fecha de Registro:</label>
+                                <input type="text" id="adminPerfilFechaRegistro" class="info-input" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="perfil-actions">
+                        <button id="btnEditarPerfilAdmin" class="btn btn-primary">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
+                            </svg>
+                            Editar Información
+                        </button>
+                        <button id="btnGuardarPerfilAdmin" class="btn btn-success hidden">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/>
+                            </svg>
+                            Guardar Cambios
+                        </button>
+                        <button id="btnCancelarPerfilAdmin" class="btn btn-secondary hidden">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                            </svg>
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar eventos -->
+    <div id="eventoModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close">&times;</span>
+            <h2 id="eventoModalTitle">
+                <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                    <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
+                </svg>
+                Crear Evento
+            </h2>
+            <form id="eventoForm">
+                <!-- Imagen del evento -->
+                <div class="form-group">
+                    <label for="eventoImagen">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21Z"/>
+                        </svg>
+                        Imagen del Evento (opcional - máx. 10MB, se redimensionará automáticamente):
+                    </label>
+                    <input type="file" id="eventoImagen" accept="image/*">
+                    <div id="imagenPreview" class="imagen-preview" style="display: none;">
+                        <img id="imagenPreviewImg" src="" alt="Vista previa" style="max-width: 100%; max-height: 200px; border-radius: 8px; margin-top: 10px;">
+                        <button type="button" id="removeImageBtn" class="btn btn-danger btn-sm" style="display: block; margin-top: 5px;">
+                            <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+                            </svg>
+                            Quitar imagen
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Nombre del evento -->
+                <div class="form-group">
+                    <label for="eventoNombre">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z"/>
+                        </svg>
+                        Nombre del Evento:
+                    </label>
+                    <input type="text" id="eventoNombre" placeholder="Ej: Campeonato Nacional de Taekwondo 2024" required>
+                </div>
+
+                <!-- Fecha del evento -->
+                <div class="form-group">
+                    <label for="eventoFecha">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,3H18V1H16V3H8V1H6V3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M19,19H5V8H19V19Z"/>
+                        </svg>
+                        Fecha del Evento:
+                    </label>
+                    <input type="date" id="eventoFecha" required>
+                </div>
+
+                <!-- Fecha límite de inscripción -->
+                <div class="form-group">
+                    <label for="eventoFechaLimite">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                        </svg>
+                        Fecha Límite de Inscripción:
+                    </label>
+                    <input type="date" id="eventoFechaLimite" required>
+                </div>
+
+                <!-- Lugar -->
+                <div class="form-group">
+                    <label for="eventoLugar">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22S19,14.25 19,9A7,7 0 0,0 12,2Z"/>
+                        </svg>
+                        Lugar:
+                    </label>
+                    <input type="text" id="eventoLugar" placeholder="Ej: Gimnasio Municipal de Deportes, Buenos Aires" required>
+                </div>
+
+                <!-- Modalidad -->
+                <div class="form-group">
+                    <label for="eventoModalidad">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16,4C16.88,4 17.67,4.38 18.18,5L20.5,2.68L21.32,3.5L19,5.82C19.62,6.33 20,7.12 20,8V16C20,18.21 18.21,20 16,20H8C5.79,20 4,18.21 4,16V8C4,5.79 5.79,4 8,4H16M16,6H8C6.9,6 6,6.9 6,8V16C6,17.1 6.9,18 8,18H16C17.1,18 18,17.1 18,16V8C18,6.9 17.1,6 16,6Z"/>
+                        </svg>
+                        Modalidad:
+                    </label>
+                    <select id="eventoModalidad" required>
+                        <option value="">Seleccionar modalidad...</option>
+                        <option value="POOMSAE">POOMSAE</option>
+                        <option value="KYORUGI">KYORUGI</option>
+                        <option value="AMBAS">KYORUGI y POOMSAE</option>
+                    </select>
+                </div>
+
+                <!-- Descripción -->
+                <div class="form-group">
+                    <label for="eventoDescripcion">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                        </svg>
+                        Descripción del Evento:
+                    </label>
+                    <textarea id="eventoDescripcion" rows="4" placeholder="Describe los detalles del evento, categorías, premios, etc." required></textarea>
+                </div>
+
+
+
+                <button type="submit" class="btn btn-primary">
+                    <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15,9H5V5H15M12,19A3,3 0 0,1 9,16A3,3 0 0,1 12,13A3,3 0 0,1 15,16A3,3 0 0,1 12,19M17,3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V7L17,3Z"/>
+                    </svg>
+                    Guardar Evento
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para inscribir alumnos -->
+    <div id="inscripcionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Inscribir Alumno</h2>
+            <h3 id="eventoInscripcionNombre"></h3>
+
+            <!-- Botón para ver atletas registrados -->
+            <button type="button" id="verAtletasBtn" class="btn btn-gold" style="padding: 20px 24px;">
+                <svg class="icon icon-md" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/>
+                </svg>
+                Ver Mis Atletas Registrados
+            </button>
+
+            <div class="inscripcion-form-section">
+                <form id="inscripcionForm">
+                    <div id="alumnosContainer">
+                        <div class="alumno-form">
+                            <div class="form-fields-grid">
+                                <div class="form-group">
+                                    <label>Nombres:</label>
+                                    <input type="text" name="nombre" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Apellidos:</label>
+                                    <input type="text" name="apellido" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Fecha de Nacimiento:</label>
+                                    <input type="date" name="fechaNacimiento" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>DNI:</label>
+                                    <input type="text" name="dni" pattern="[0-9]{8}" maxlength="8" placeholder="12345678" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>GRADO KUP:</label>
+                                    <select name="cinturon" required>
+                                        <option value="">Seleccionar grado KUP/DAN...</option>
+                                        <optgroup label="KUP (Cinturones de Color)">
+                                            <option value="KUP-10">10º KUP - Blanco</option>
+                                            <option value="KUP-9">9º KUP - Blanco/Amarillo</option>
+                                            <option value="KUP-8">8º KUP - Amarillo</option>
+                                            <option value="KUP-7">7º KUP - Amarillo/Verde</option>
+                                            <option value="KUP-6">6º KUP - Verde</option>
+                                            <option value="KUP-5">5º KUP - Verde/Azul</option>
+                                            <option value="KUP-4">4º KUP - Azul</option>
+                                            <option value="KUP-3">3º KUP - Azul/Rojo</option>
+                                            <option value="KUP-2">2º KUP - Rojo</option>
+                                            <option value="KUP-1">1º KUP - Rojo/Negro</option>
+                                        </optgroup>
+                                        <optgroup label="DAN (Cinturón Negro)">
+                                            <option value="DAN-1">1º DAN - Cinturón Negro</option>
+                                            <option value="DAN-2">2º DAN - Cinturón Negro</option>
+                                            <option value="DAN-3">3º DAN - Cinturón Negro</option>
+                                            <option value="DAN-4">4º DAN - Cinturón Negro</option>
+                                            <option value="DAN-5">5º DAN - Cinturón Negro</option>
+                                            <option value="DAN-6">6º DAN - Cinturón Negro</option>
+                                            <option value="DAN-7">7º DAN - Cinturón Negro</option>
+                                            <option value="DAN-8">8º DAN - Cinturón Negro</option>
+                                            <option value="DAN-9">9º DAN - Cinturón Negro</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Sexo:</label>
+                                    <select name="sexo" required>
+                                        <option value="">Seleccionar sexo...</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Peso (kg):</label>
+                                    <input type="number" name="peso" min="20" max="200" step="0.1" placeholder="65.5" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">INSCRIBIR ALUMNO</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para atletas existentes -->
+    <div id="atletasExistentesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="existing-athletes-section">
+                <h4>
+                    <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/>
+                    </svg>
+                    Mis Atletas Registrados
+                </h4>
+                <div class="existing-athletes-table-container">
+                    <table class="participantes-tabla">
+                        <thead>
+                            <tr>
+                                <th>Nombres</th>
+                                <th>Apellidos</th>
+                                <th>DNI</th>
+                                <th>Fecha Nac.</th>
+                                <th>Sexo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="existingAthletesTableBody">
+                            <!-- Los atletas existentes se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Vista Previa de Imagen -->
+    <div id="imagePreviewModal" class="modal image-preview-modal">
+        <div class="image-preview-content">
+            <span class="close image-preview-close">&times;</span>
+            <img id="imagePreviewImg" src="" alt="Vista previa">
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="footer-logo">
+                        <img src="mexxus_arena_footer.png" alt="MEXXUS ARENA" class="footer-logo-image">
+                    </div>
+                    <p class="footer-description">Sistema de gestión para eventos deportivos de taekwondo</p>
+                    <div class="footer-socials">
+                        <a href="#" title="Instagram" aria-label="Instagram"><svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M7.75 2h8.5A5.75 5.75 0 0 1 22 7.75v8.5A5.75 5.75 0 0 1 16.25 22h-8.5A5.75 5.75 0 0 1 2 16.25v-8.5A5.75 5.75 0 0 1 7.75 2zm0 1.5A4.25 4.25 0 0 0 3.5 7.75v8.5A4.25 4.25 0 0 0 7.75 20.5h8.5A4.25 4.25 0 0 0 20.5 16.25v-8.5A4.25 4.25 0 0 0 16.25 3.5zm4.25 2.25a6.25 6.25 0 1 1 0 12.5a6.25 6.25 0 0 1 0-12.5zm0 1.5a4.75 4.75 0 1 0 0 9.5a4.75 4.75 0 0 0 0-9.5zm5.25 1.25a1 1 0 1 1-2 0a1 1 0 0 1 2 0z"/></svg></a>
+                        <a href="#" title="Facebook" aria-label="Facebook"><svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M17 2.1v3.2h-1.7c-.2 0-.3.2-.3.4v2.1h2v3.2h-2v8.1h-3.3v-8.1h-2v-3.2h2V5.7c0-1.7 1.3-3 3-3h2.3z"/></svg></a>
+                        <a href="#" title="YouTube" aria-label="YouTube"><svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M21.8 8.001a2.75 2.75 0 0 0-1.94-1.94C18.2 6 12 6 12 6s-6.2 0-7.86.06A2.75 2.75 0 0 0 2.2 8.001C2 9.66 2 12 2 12s0 2.34.2 3.999a2.75 2.75 0 0 0 1.94 1.94C5.8 18 12 18 12 18s6.2 0 7.86-.06a2.75 2.75 0 0 0 1.94-1.94C22 14.34 22 12 22 12s0-2.34-.2-3.999zM10 15.5v-7l6 3.5l-6 3.5z"/></svg></a>
+                    </div>
+                </div>
+                <div class="footer-developer">
+                    <p class="developer-credit">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"/>
+                        </svg>
+                        Desarrollado por <strong>Santiago Alejandro Arones Quintanilla</strong>
+                    </p>
+                    <p class="copyright">© 2024 MEXXUS ARENA. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="config.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="auth.js"></script>
+    <script src="events.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="public-events.js"></script>
+    <script src="admin.js"></script>
+    <script src="app.js"></script>
+
+    <!-- Modal de Importación de Base de Datos -->
+    <div id="importDBModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>
+                <svg class="icon icon-lg" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                Importar Base de Datos de Atletas
+            </h2>
+            
+            <div class="import-instructions">
+                <h4>📋 Formato requerido:</h4>
+                <p>Tu archivo Excel debe tener las siguientes columnas <strong>exactamente</strong>:</p>
+                <div class="required-columns">
+                    <span class="column-tag">NOMBRE</span>
+                    <span class="column-tag">APELLIDO</span>
+                    <span class="column-tag">FECHA DE NACIMIENTO</span>
+                    <span class="column-tag">DNI</span>
+                    <span class="column-tag">SEXO</span>
+                </div>
+                <p class="text-muted">
+                    • <strong>NOMBRE y APELLIDO:</strong> Texto<br>
+                    • <strong>FECHA DE NACIMIENTO:</strong> DD/MM/AAAA o DD-MM-AAAA<br>
+                    • <strong>DNI:</strong> 8 dígitos (ej: 12345678)<br>
+                    • <strong>SEXO:</strong> Masculino, Femenino, M, F
+                </p>
+                <div class="template-download">
+                    <button id="btnDescargarPlantilla" class="btn btn-outline">
+                        <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,12L16,16H13.5V19H10.5V16H8L12,12Z"/>
+                        </svg>
+                        Descargar Plantilla de Ejemplo
+                    </button>
+                </div>
+            </div>
+
+            <div class="import-dropzone" id="importDropzone">
+                <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+                </svg>
+                <p>Arrastra y suelta tu archivo Excel o CSV aquí</p>
+                <p class="text-muted">o haz clic para seleccionar el archivo</p>
+                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display: none;">
+            </div>
+            <div class="import-info">
+                <p class="text-muted">Formatos soportados: Excel (.xlsx, .xls) y CSV</p>
+                <p class="text-muted">Tamaño máximo: 5MB</p>
+                <p class="text-warning">⚠️ Se omitirán atletas con DNI duplicados</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar participantes -->
+    <div id="editarParticipantesModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Editar Participante</h2>
+            <h3 id="eventoEdicionNombre"></h3>
+
+            <!-- Botón para ver atletas registrados -->
+            <button type="button" id="verAtletasEdicionBtn" class="btn btn-gold" style="padding: 20px 24px;">
+                <svg class="icon icon-md" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M16,13C15.71,13 15.38,13 15.03,13.05C16.19,13.89 17,15 17,16.5V19H23V16.5C23,14.17 18.33,13 16,13M8,13C5.67,13 1,14.17 1,16.5V19H15V16.5C15,14.17 10.33,13 8,13M8,11A3,3 0 0,0 11,8A3,3 0 0,0 8,5A3,3 0 0,0 5,8A3,3 0 0,0 8,11M16,11A3,3 0 0,0 19,8A3,3 0 0,0 16,5A3,3 0 0,0 13,8A3,3 0 0,0 16,11Z"/>
+                </svg>
+                Ver Mis Atletas Registrados
+            </button>
+
+            <div class="inscripcion-form-section">
+                <form id="edicionParticipanteForm">
+                    <div id="participantesContainer">
+                        <div class="alumno-form">
+                            <div class="form-fields-grid">
+                                <div class="form-group">
+                                    <label>Nombres:</label>
+                                    <input type="text" name="nombre" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Apellidos:</label>
+                                    <input type="text" name="apellido" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Fecha de Nacimiento:</label>
+                                    <input type="date" name="fechaNacimiento" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>DNI:</label>
+                                    <input type="text" name="dni" pattern="[0-9]{8}" maxlength="8" placeholder="12345678" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>GRADO KUP:</label>
+                                    <select name="cinturon" required>
+                                        <option value="">Seleccionar grado KUP/DAN...</option>
+                                        <optgroup label="KUP (Cinturones de Color)">
+                                            <option value="KUP-10">10º KUP - Blanco</option>
+                                            <option value="KUP-9">9º KUP - Blanco/Amarillo</option>
+                                            <option value="KUP-8">8º KUP - Amarillo</option>
+                                            <option value="KUP-7">7º KUP - Amarillo/Verde</option>
+                                            <option value="KUP-6">6º KUP - Verde</option>
+                                            <option value="KUP-5">5º KUP - Verde/Azul</option>
+                                            <option value="KUP-4">4º KUP - Azul</option>
+                                            <option value="KUP-3">3º KUP - Azul/Rojo</option>
+                                            <option value="KUP-2">2º KUP - Rojo</option>
+                                            <option value="KUP-1">1º KUP - Rojo/Negro</option>
+                                        </optgroup>
+                                        <optgroup label="DAN (Cinturón Negro)">
+                                            <option value="DAN-1">1º DAN - Cinturón Negro</option>
+                                            <option value="DAN-2">2º DAN - Cinturón Negro</option>
+                                            <option value="DAN-3">3º DAN - Cinturón Negro</option>
+                                            <option value="DAN-4">4º DAN - Cinturón Negro</option>
+                                            <option value="DAN-5">5º DAN - Cinturón Negro</option>
+                                            <option value="DAN-6">6º DAN - Cinturón Negro</option>
+                                            <option value="DAN-7">7º DAN - Cinturón Negro</option>
+                                            <option value="DAN-8">8º DAN - Cinturón Negro</option>
+                                            <option value="DAN-9">9º DAN - Cinturón Negro</option>
+                                        </optgroup>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Sexo:</label>
+                                    <select name="sexo" required>
+                                        <option value="">Seleccionar sexo...</option>
+                                        <option value="Masculino">Masculino</option>
+                                        <option value="Femenino">Femenino</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Peso (kg):</label>
+                                    <input type="number" name="peso" min="20" max="200" step="0.1" placeholder="65.5" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Modalidad:</label>
+                                    <select name="modalidad" required>
+                                        <option value="">Seleccionar modalidad...</option>
+                                        <option value="POOMSAE">POOMSAE</option>
+                                        <option value="KYORUGI">KYORUGI</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-warning">ACTUALIZAR PARTICIPANTE</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global function for resetting llaves form
+        function resetLlavesForm() {
+            const fileInput = document.getElementById('llavesFileInput');
+            const selectedFile = document.getElementById('llavesSelectedFile');
+            const selectedFileName = selectedFile?.querySelector('.llaves-selected-file-name');
+            const dropZone = document.getElementById('llavesDropZone');
+            const successOverlay = document.getElementById('llavesSuccessOverlay');
+            const loadingOverlay = document.getElementById('llavesLoadingOverlay');
+            const form = document.getElementById('llavesUploadForm');
+
+            if (fileInput) fileInput.value = '';
+            if (selectedFile) selectedFile.style.display = 'none';
+            if (selectedFileName) selectedFileName.textContent = '';
+            if (dropZone) {
+                dropZone.style.borderColor = 'var(--color-gray-300)';
+                dropZone.style.background = 'var(--color-gray-50)';
+            }
+            if (successOverlay) successOverlay.style.display = 'none';
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
+            if (form) form.reset();
+        }
+    </script>
+</body>
+</html> 

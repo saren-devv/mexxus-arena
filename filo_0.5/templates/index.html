@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Llaves</title>
+  <style>
+    :root {
+      --primary-color: #a98f71;
+      --primary-light: #c9a882;
+      --success-color: #00ff00;
+      --error-color: #e63946;
+      --border-color: #ddd;
+      --text-color: #2b2d42;
+      --bg-color: #f8f9fa;
+      --success-bg: #a98f71;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body { 
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      color: var(--text-color);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 { 
+      color: white;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-size: 2.5rem;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .messages { 
+      color: var(--error-color);
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .upload-container {
+      background-color: white;
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .drop-zone {
+      border: 3px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .drop-zone.dragover {
+      border-color: var(--primary-color);
+      background-color: rgba(67, 97, 238, 0.05);
+      transform: scale(1.02);
+    }
+
+    .drop-zone-text {
+      color: var(--text-color);
+      font-size: 1.1rem;
+    }
+
+    .drop-zone-icon {
+      font-size: 3rem;
+      color: var(--primary-color);
+      margin-bottom: 1rem;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .selected-file {
+      margin: 1rem 0;
+      padding: 1rem;
+      background-color: var(--bg-color);
+      border-radius: 8px;
+      display: none;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .selected-file-icon {
+      color: var(--primary-color);
+      font-size: 1.5rem;
+    }
+
+    .selected-file-name {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .remove-file {
+      background: none;
+      border: none;
+      color: var(--error-color);
+      cursor: pointer;
+      padding: 0.5rem;
+      margin: 0;
+      width: auto;
+    }
+
+    button.submit-btn {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button.submit-btn:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    button.submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid var(--primary-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    .success-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(49, 208, 170, 0.95);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      color: white;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    .success-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .success-message {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      animation: slideUp 0.5s ease-out 0.3s both;
+    }
+
+    .success-details {
+      font-size: 1rem;
+      opacity: 0.9;
+      text-align: center;
+      max-width: 80%;
+      margin-bottom: 2rem;
+      animation: slideUp 0.5s ease-out 0.4s both;
+    }
+
+    .new-upload-btn {
+      background-color: white;
+      color: var(--success-bg);
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: slideUp 0.5s ease-out 0.5s both;
+    }
+
+    .new-upload-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes bounceIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+      50% {
+        opacity: 0.9;
+        transform: scale(1.1);
+      }
+      80% {
+        opacity: 1;
+        transform: scale(0.89);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .upload-container {
+        padding: 1.5rem;
+      }
+
+      .success-message {
+        font-size: 1.2rem;
+      }
+
+      .success-details {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>GENERAR LLAVES DE COMBATE</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="messages">
+          {% for category, message in messages %}
+            <p>{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="upload-container">
+      <form id="uploadForm" method="post" enctype="multipart/form-data">
+        <div id="dropZone" class="drop-zone">
+          <div class="drop-zone-icon">📄</div>
+          <div class="drop-zone-text">
+            <strong>Arrastra y suelta tu archivo Excel aquí</strong>
+            <br>o<br>
+            <span style="color: var(--primary-color);">Haz clic para seleccionar</span>
+          </div>
+          <input type="file" name="participants" accept=".xls,.xlsx" class="file-input" id="fileInput" required>
+        </div>
+        <div id="selectedFile" class="selected-file">
+          <span class="selected-file-icon">📎</span>
+          <span class="selected-file-name"></span>
+          <button type="button" class="remove-file" title="Eliminar archivo">❌</button>
+        </div>
+        <button type="submit" class="submit-btn" id="submitBtn">
+          Generar Llaves
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <p>Generando llaves...</p>
+  </div>
+
+  <div class="success-overlay" id="successOverlay">
+    <div class="success-icon">✨</div>
+    <h2 class="success-message">¡Brackets Generados Exitosamente!</h2>
+    <p class="success-details">El PDF con todos los brackets ha sido generado y se está descargando automáticamente.</p>
+    <button class="new-upload-btn" onclick="resetForm()">Generar Nuevos Brackets</button>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const selectedFile = document.getElementById('selectedFile');
+    const selectedFileName = selectedFile.querySelector('.selected-file-name');
+    const removeFileBtn = selectedFile.querySelector('.remove-file');
+    const form = document.getElementById('uploadForm');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const successOverlay = document.getElementById('successOverlay');
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+      document.body.addEventListener(eventName, preventDefaults, false);
+    });
+
+    // Highlight drop zone when dragging over it
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, unhighlight, false);
+    });
+
+    // Handle dropped files
+    dropZone.addEventListener('drop', handleDrop, false);
+    
+    // Handle click to select files
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    // Handle file selection through input
+    fileInput.addEventListener('change', handleFiles);
+
+    // Handle remove file button
+    removeFileBtn.addEventListener('click', removeFile);
+
+    // Handle form submission
+    form.addEventListener('submit', handleSubmit);
+
+    function preventDefaults (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    function highlight(e) {
+      dropZone.classList.add('dragover');
+    }
+
+    function unhighlight(e) {
+      dropZone.classList.remove('dragover');
+    }
+
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      handleFiles({ target: { files: files } });
+    }
+
+    function handleFiles(e) {
+      const files = e.target.files;
+      if (files.length) {
+        const file = files[0];
+        if (file.name.match(/\.(xls|xlsx)$/)) {
+          fileInput.files = files;
+          selectedFile.style.display = 'flex';
+          selectedFileName.textContent = file.name;
+          dropZone.style.borderColor = 'var(--success-color)';
+        } else {
+          alert('Por favor, selecciona un archivo Excel válido (.xls o .xlsx)');
+          removeFile();
+        }
+      }
+    }
+
+    function removeFile() {
+      fileInput.value = '';
+      selectedFile.style.display = 'none';
+      selectedFileName.textContent = '';
+      dropZone.style.borderColor = 'var(--border-color)';
+    }
+
+    function handleSubmit(e) {
+      if (!fileInput.files.length) {
+        e.preventDefault();
+        alert('Por favor, selecciona un archivo Excel');
+        return;
+      }
+      loadingOverlay.style.display = 'flex';
+      
+      // Start checking for PDF download
+      checkForPdfDownload();
+    }
+
+    function resetForm() {
+      removeFile();
+      successOverlay.style.display = 'none';
+      loadingOverlay.style.display = 'none';
+      form.reset();
+    }
+
+    // Handle file download and success screen
+    window.addEventListener('load', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('status') === 'success') {
+        loadingOverlay.style.display = 'none';
+        successOverlay.style.display = 'flex';
+        // Clean up the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    });
+
+    function checkForPdfDownload() {
+      let pdfDownloaded = false;
+      let excelDownloaded = false;
+
+      // Create a hidden iframe to track download
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+
+      // Create link elements for downloads
+      const pdfLink = document.createElement('a');
+      pdfLink.style.display = 'none';
+      document.body.appendChild(pdfLink);
+
+      const excelLink = document.createElement('a');
+      excelLink.style.display = 'none';
+      document.body.appendChild(excelLink);
+
+      function cleanupAndShowSuccess() {
+        clearInterval(checkInterval);
+        loadingOverlay.style.display = 'none';
+        successOverlay.style.display = 'flex';
+        if (document.body.contains(iframe)) document.body.removeChild(iframe);
+        if (document.body.contains(pdfLink)) document.body.removeChild(pdfLink);
+        if (document.body.contains(excelLink)) document.body.removeChild(excelLink);
+      }
+
+      // Check every second if the files are ready
+      const checkInterval = setInterval(() => {
+        try {
+          // Try to fetch the status from the server response
+          fetch(window.location.href + '?check_status=true')
+            .then(response => response.text())
+            .then(text => {
+              const data = JSON.parse(text);
+              if (data.status === 'success' && (!pdfDownloaded || !excelDownloaded)) {
+                // Download PDF if not already downloaded
+                if (!pdfDownloaded) {
+                  fetch(window.location.href + '?download=pdf')
+                    .then(response => response.blob())
+                    .then(blob => {
+                      const url = window.URL.createObjectURL(blob);
+                      pdfLink.href = url;
+                      pdfLink.download = 'brackets.pdf';
+                      pdfLink.click();
+                      window.URL.revokeObjectURL(url);
+                      pdfDownloaded = true;
+                      
+                      // Start Excel download after PDF
+                      if (!excelDownloaded) {
+                        fetch(window.location.href + '?download=excel')
+                          .then(response => response.blob())
+                          .then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            excelLink.href = url;
+                            excelLink.download = 'SOLOS.xlsx';
+                            excelLink.click();
+                            window.URL.revokeObjectURL(url);
+                            excelDownloaded = true;
+                            
+                            // Show success after both files are downloaded
+                            cleanupAndShowSuccess();
+                          })
+                          .catch(error => {
+                            console.error('Excel download error:', error);
+                            alert('Error al descargar el archivo Excel. Por favor, intenta nuevamente.');
+                            location.reload();
+                          });
+                      }
+                    })
+                    .catch(error => {
+                      console.error('PDF download error:', error);
+                      alert('Error al descargar el archivo PDF. Por favor, intenta nuevamente.');
+                      location.reload();
+                    });
+                }
+              }
+            })
+            .catch(() => {
+              if (pdfDownloaded && excelDownloaded) {
+                cleanupAndShowSuccess();
+              }
+            });
+        } catch (e) {
+          if (pdfDownloaded && excelDownloaded) {
+            cleanupAndShowSuccess();
+          }
+        }
+      }, 1000);
+
+      // Stop checking after 60 seconds to prevent infinite loop
+      setTimeout(() => {
+        clearInterval(checkInterval);
+        if (document.body.contains(iframe)) document.body.removeChild(iframe);
+        if (document.body.contains(pdfLink)) document.body.removeChild(pdfLink);
+        if (document.body.contains(excelLink)) document.body.removeChild(excelLink);
+        // If we're still loading after 60 seconds, something went wrong
+        if (loadingOverlay.style.display === 'flex') {
+          loadingOverlay.style.display = 'none';
+          alert('La generación de los archivos está tomando más tiempo de lo esperado. Por favor, intenta nuevamente.');
+          location.reload();
+        }
+      }, 60000);
+    }
+
+    // Monitor form submission response
+    form.addEventListener('submit', function(e) {
+      const formData = new FormData(form);
+      
+      e.preventDefault();
+      loadingOverlay.style.display = 'flex';
+
+      fetch(form.action, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (response.headers.get('Content-Type') === 'application/json') {
+          return response.json().then(data => {
+            if (data.status === 'success') {
+              // Start tracking the downloads
+              checkForPdfDownload();
+            } else if (data.error) {
+              loadingOverlay.style.display = 'none';
+              alert('Error: ' + data.error);
+              location.reload();
+            }
+          });
+        } else {
+          return response.text().then(text => {
+            if (text && text.includes('error')) {
+              loadingOverlay.style.display = 'none';
+              location.reload();
+            }
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        loadingOverlay.style.display = 'none';
+        alert('Error al procesar el archivo. Por favor, intenta nuevamente.');
+        location.reload();
+      });
+    });
+  </script>
+</body>
+</html>
