@@ -1,1 +1,1 @@
-web: python3 bracket_generator.py 
+web: gunicorn --bind 0.0.0.0:$PORT bracket_generator:app 
