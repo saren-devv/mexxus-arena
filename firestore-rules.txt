@@ -1,0 +1,119 @@
+// Reglas de Firestore para MEXXUS ARENA
+// Estas reglas permiten acceso a usuarios autenticados
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ========================================
+    // REGLAS PARA EVENTOS
+    // ========================================
+    match /eventos/{eventoId} {
+      // Cualquiera puede leer eventos (públicos)
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden crear eventos
+      allow create: if request.auth != null 
+        && request.auth.uid != null
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.academiaId == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      
+      // Solo el creador del evento puede editarlo
+      allow update: if request.auth != null 
+        && request.auth.uid != null
+        && resource.data.createdBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      
+      // Solo el creador del evento puede eliminarlo
+      allow delete: if request.auth != null 
+        && request.auth.uid != null
+        && resource.data.createdBy == request.auth.uid;
+    }
+    
+    // ========================================
+    // REGLAS PARA INSCRIPCIONES
+    // ========================================
+    match /inscripciones/{inscripcionId} {
+      // Permitir lectura pública para estadísticas de eventos
+      // Solo campos básicos para evitar exposición de datos sensibles
+      allow read: if true;
+      
+      // Solo usuarios autenticados pueden crear inscripciones
+      allow create: if request.auth != null 
+        && request.auth.uid != null
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      
+      // Solo el creador de la inscripción puede editarla
+      allow update: if request.auth != null 
+        && request.auth.uid != null
+        && resource.data.createdBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      
+      // Solo el creador de la inscripción puede eliminarla
+      allow delete: if request.auth != null 
+        && request.auth.uid != null
+        && resource.data.createdBy == request.auth.uid;
+    }
+    
+    // ========================================
+    // REGLAS PARA ATLETAS
+    // ========================================
+    match /atletas/{atletaId} {
+      // Solo la academia propietaria puede leer sus atletas
+      allow read: if request.auth != null 
+        && request.auth.uid != null
+        && resource.data.academiaId == request.auth.uid;
+      
+      // Solo usuarios autenticados pueden crear atletas
+      allow create: if request.auth != null 
+        && request.auth.uid != null
+        && request.resource.data.academiaId == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      
+      // Solo la academia propietaria puede editar sus atletas
+      allow update: if request.auth != null 
+        && request.auth.uid != null
+        && resource.data.academiaId == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      
+      // Solo la academia propietaria puede eliminar sus atletas
+      allow delete: if request.auth != null 
+        && request.auth.uid != null
+        && resource.data.academiaId == request.auth.uid;
+    }
+    
+    // ========================================
+    // REGLAS PARA USUARIOS/DELEGACIONES
+    // ========================================
+    match /users/{userId} {
+      // Permitir lectura pública de información básica de academias
+      // Solo para mostrar en eventos públicos
+      allow read: if true;
+      
+      // Solo el propio usuario puede crear/editar sus datos
+      allow write: if request.auth != null 
+        && request.auth.uid == userId;
+    }
+    
+    // ========================================
+    // REGLAS PARA CONFIGURACIÓN (futuro admin)
+    // ========================================
+    match /config/{configId} {
+      // Por ahora, solo lectura pública para configuraciones básicas
+      allow read: if true;
+      
+      // Sin escritura por ahora (se implementará con admin)
+      allow write: if false;
+    }
+    
+    // ========================================
+    // REGLA GENERAL - DENEGAR TODO LO DEMÁS
+    // ========================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+} 

@@ -1,0 +1,37 @@
+// Reglas de Firebase Storage para MEXXUS ARENA
+// Estas reglas permiten acceso a usuarios autenticados para sus propios archivos
+
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Regla para archivos de eventos
+    match /eventos/{eventoId}/{tipo}/{fileName} {
+      // Permitir lectura a usuarios autenticados
+      allow read: if request.auth != null;
+      
+      // Permitir escritura y eliminación solo al creador del evento o admin
+      allow write, delete: if request.auth != null && 
+        (
+          // El usuario es el creador del evento (verificar en Firestore)
+          exists(/databases/$(firestore.default)/documents/eventos/$(eventoId)) &&
+          (
+            request.auth.uid == resource.metadata.createdBy ||
+            request.auth.uid == resource.metadata.academiaId ||
+            request.auth.token.admin == true
+          )
+        );
+    }
+    
+    // Regla para archivos de perfil de usuario
+    match /users/{userId}/{fileName} {
+      allow read: if request.auth != null;
+      allow write, delete: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Regla general para otros archivos
+    match /{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write, delete: if request.auth != null;
+    }
+  }
+} 

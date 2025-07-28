@@ -1,0 +1,238 @@
+{
+    "modalidades": {
+        "kyorugui": {
+            "nombre": "Kyorugi",
+            "descripcion": "Combate",
+            "categorias_peso": {
+                "pre_infantil": {
+                    "mixto": ["-24kg"]
+                },
+                "infantil_a": {
+                    "mixto": [
+                        "-19kg",
+                        "-23kg",
+                        "-27kg",
+                        "-31kg",
+                        "+31kg"
+                    ]
+                },
+                "infantil_b": {
+                    "mixto": [
+                        "-21kg",
+                        "-25kg",
+                        "-30kg",
+                        "-35kg",
+                        "+35kg"
+                    ]
+                },
+                "infantil_c": {
+                    "mixto": [
+                        "-30kg",
+                        "-35kg",
+                        "-40kg",
+                        "-45kg",
+                        "+45kg"
+                    ]
+                },
+                "cadete": {
+                    "femenino": [
+                        "-29kg",
+                        "-33kg",
+                        "-37kg",
+                        "-41kg",
+                        "-44kg",
+                        "-47kg",
+                        "-51kg",
+                        "-55kg",
+                        "-59kg",
+                        "+59kg"
+                    ],
+                    "masculino": [
+                        "-33kg",
+                        "-37kg",
+                        "-41kg",
+                        "-45kg",
+                        "-49kg",
+                        "-53kg",
+                        "-57kg",
+                        "-61kg",
+                        "-65kg",
+                        "+65kg"
+                    ]
+                },
+                "juvenil": {
+                    "femenino": [
+                        "-42kg",
+                        "-44kg",
+                        "-46kg",
+                        "-49kg",
+                        "-52kg",
+                        "-55kg",
+                        "-59kg",
+                        "-63kg",
+                        "-68kg",
+                        "+68kg"
+                    ],
+                    "masculino": [
+                        "-45kg",
+                        "-48kg",
+                        "-51kg",
+                        "-55kg",
+                        "-59kg",
+                        "-63kg",
+                        "-68kg",
+                        "-73kg",
+                        "-78kg",
+                        "+78kg"
+                    ]
+                },
+                "mayores": {
+                    "femenino": [
+                        "-46kg",
+                        "-49kg",
+                        "-53kg",
+                        "-57kg",
+                        "-62kg",
+                        "-67kg",
+                        "-73kg",
+                        "+73kg"
+                    ],
+                    "masculino": [
+                        "-54kg",
+                        "-58kg",
+                        "-63kg",
+                        "-68kg",
+                        "-74kg",
+                        "-80kg",
+                        "-87kg",
+                        "+87kg"
+                    ]
+                }
+            }
+        },
+        "poomsae": {
+            "nombre": "Poomsae",
+            "descripcion": "Formas",
+            "categorias": {
+                "individual": "Individual",
+                "pareja": "Pareja Mixta",
+                "equipo": "Equipo"
+            }
+        }
+    },
+    "niveles": {
+        "festival": {
+            "nombre": "Festival",
+            "descripcion": "Nivel principiante",
+            "cinturones": ["blanco", "blanco_amarillo", "amarillo", "amarillo_verde"]
+        },
+        "noveles": {
+            "nombre": "Noveles",
+            "descripcion": "Nivel intermedio",
+            "cinturones": ["verde", "verde_azul", "azul", "azul_rojo"]
+        },
+        "avanzados": {
+            "nombre": "Avanzados",
+            "descripcion": "Nivel avanzado",
+            "cinturones": ["rojo", "rojo_negro", "negro"]
+        }
+    },
+    "cinturones": {
+        "blanco": {
+            "nombre": "Blanco",
+            "nivel": 1,
+            "gup": "10º gup",
+            "categoria": "festival"
+        },
+        "blanco_amarillo": {
+            "nombre": "Blanco Punta Amarilla",
+            "nivel": 2,
+            "gup": "9º gup",
+            "categoria": "festival"
+        },
+        "amarillo": {
+            "nombre": "Amarillo",
+            "nivel": 3,
+            "gup": "8º gup",
+            "categoria": "festival"
+        },
+        "amarillo_verde": {
+            "nombre": "Amarillo Punta Verde",
+            "nivel": 4,
+            "gup": "7º gup",
+            "categoria": "festival"
+        },
+        "verde": {
+            "nombre": "Verde",
+            "nivel": 5,
+            "gup": "6º gup",
+            "categoria": "noveles"
+        },
+        "verde_azul": {
+            "nombre": "Verde Punta Azul",
+            "nivel": 6,
+            "gup": "5º gup",
+            "categoria": "noveles"
+        },
+        "azul": {
+            "nombre": "Azul",
+            "nivel": 7,
+            "gup": "4º gup",
+            "categoria": "noveles"
+        },
+        "azul_rojo": {
+            "nombre": "Azul Punta Roja",
+            "nivel": 8,
+            "gup": "3º gup",
+            "categoria": "noveles"
+        },
+        "rojo": {
+            "nombre": "Rojo",
+            "nivel": 9,
+            "gup": "2º gup",
+            "categoria": "avanzados"
+        },
+        "rojo_negro": {
+            "nombre": "Rojo Punta Negra",
+            "nivel": 10,
+            "gup": "1º gup",
+            "categoria": "avanzados"
+        },
+        "negro": {
+            "nombre": "Negro",
+            "nivel": 11,
+            "dans": ["1º dan", "2º dan", "3º dan", "4º dan", "5º dan"],
+            "categoria": "avanzados"
+        }
+    },
+    "divisiones_edad": {
+        "pre_infantil": {
+            "nombre": "Pre-Infantil",
+            "rango": "hasta 6 años"
+        },
+        "infantil_a": {
+            "nombre": "Infantil A",
+            "rango": "7-8 años"
+        },
+        "infantil_b": {
+            "nombre": "Infantil B",
+            "rango": "9-10 años"
+        },
+        "infantil_c": {
+            "nombre": "Infantil C",
+            "rango": "11-12 años"
+        },
+        "cadete": {
+            "nombre": "Cadete",
+            "rango": "12-14 años"
+        },
+        "juvenil": {
+            "nombre": "Juvenil",
+            "rango": "15-17 años"
+        },
+        "mayores": {
+            "nombre": "Mayores",
+            "rango": "18+ años"
+        }
+    }
+} 

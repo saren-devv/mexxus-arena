@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Inscripciones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .debug-title {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .debug-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .error {
+            color: #dc3545;
+        }
+        .success {
+    color: var(--color-gold);
+}
+    </style>
+</head>
+<body>
+    <h1>Debug Inscripciones - MEXXUS ARENA</h1>
+    
+    <div class="debug-section">
+        <h2 class="debug-title">Estado Actual</h2>
+        <div id="currentState" class="debug-content">Cargando...</div>
+        <button class="test-button" onclick="checkCurrentState()">Verificar Estado</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2 class="debug-title">Logs de Consola</h2>
+        <div id="consoleLogs" class="debug-content">Los logs aparecerán aquí...</div>
+        <button class="test-button" onclick="clearLogs()">Limpiar Logs</button>
+    </div>
+    
+    <div class="debug-section">
+        <h2 class="debug-title">Pruebas</h2>
+        <button class="test-button" onclick="testLoadExistingStudents()">Probar loadExistingStudents</button>
+        <button class="test-button" onclick="testPanelInscripcion()">Probar Panel Inscripción</button>
+        <button class="test-button" onclick="testFirebaseConnection()">Probar Conexión Firebase</button>
+    </div>
+
+    <script>
+        // Capturar logs de consola
+        const originalLog = console.log;
+        const originalError = console.error;
+        const logsContainer = document.getElementById('consoleLogs');
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[LOG] ${args.join(' ')}`;
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            const logEntry = document.createElement('div');
+            logEntry.className = 'error';
+            logEntry.textContent = `[ERROR] ${args.join(' ')}`;
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        };
+
+        function checkCurrentState() {
+            const stateContainer = document.getElementById('currentState');
+            let state = '';
+            
+            // Verificar managers
+            state += `Events Manager: ${window.eventsManager ? '✅ Disponible' : '❌ No disponible'}\n`;
+            state += `Auth Manager: ${window.authManager ? '✅ Disponible' : '❌ No disponible'}\n`;
+            state += `Panel Inscripción Manager: ${window.panelInscripcionManager ? '✅ Disponible' : '❌ No disponible'}\n`;
+            state += `Firebase DB: ${window.firebaseDB ? '✅ Disponible' : '❌ No disponible'}\n\n`;
+            
+            // Verificar usuario actual
+            if (window.authManager) {
+                const currentUser = window.authManager.getCurrentUser();
+                state += `Usuario actual: ${currentUser ? currentUser.uid : 'No logueado'}\n`;
+                if (currentUser) {
+                    state += `Tipo: ${currentUser.tipo}\n`;
+                    state += `Nombre: ${currentUser.nombre}\n`;
+                }
+            }
+            
+            // Verificar elementos DOM
+            state += `\nElementos DOM:\n`;
+            state += `alumnosContainer: ${document.getElementById('alumnosContainer') ? '✅ Encontrado' : '❌ No encontrado'}\n`;
+            state += `inscripcionModal: ${document.getElementById('inscripcionModal') ? '✅ Encontrado' : '❌ No encontrado'}\n`;
+            state += `panelInscripcion: ${document.getElementById('panelInscripcion') ? '✅ Encontrado' : '❌ No encontrado'}\n`;
+            
+            stateContainer.textContent = state;
+        }
+
+        function testLoadExistingStudents() {
+            console.log('🧪 Probando loadExistingStudents...');
+            
+            if (!window.eventsManager) {
+                console.error('❌ Events Manager no disponible');
+                return;
+            }
+            
+            // Datos de prueba
+            const testAlumnos = [
+                {
+                    nombre: 'Juan',
+                    apellido: 'Pérez',
+                    dni: '12345678',
+                    fechaNacimiento: '2000-01-01',
+                    cinturon: 'KUP-3',
+                    sexo: 'Masculino',
+                    modalidad: 'KYORUGI',
+                    peso: 70
+                },
+                {
+                    nombre: 'María',
+                    apellido: 'García',
+                    dni: '87654321',
+                    fechaNacimiento: '2002-05-15',
+                    cinturon: 'DAN-1',
+                    sexo: 'Femenino',
+                    modalidad: 'POOMSAE',
+                    poomsae: 'Taegeuk 1 Jang'
+                }
+            ];
+            
+            console.log('📋 Datos de prueba:', testAlumnos);
+            window.eventsManager.loadExistingStudents(testAlumnos);
+        }
+
+        function testPanelInscripcion() {
+            console.log('🧪 Probando Panel Inscripción...');
+            
+            if (!window.panelInscripcionManager) {
+                console.error('❌ Panel Inscripción Manager no disponible');
+                return;
+            }
+            
+            // Simular un evento de prueba
+            const testEvento = {
+                id: 'test-evento-id',
+                nombre: 'Evento de Prueba',
+                modalidad: 'AMBAS'
+            };
+            
+            console.log('📋 Evento de prueba:', testEvento);
+            window.panelInscripcionManager.setCurrentEvento(testEvento);
+            window.panelInscripcionManager.recargarAlumnosInscritos();
+        }
+
+        function testFirebaseConnection() {
+            console.log('🧪 Probando conexión Firebase...');
+            
+            if (!window.firebaseDB) {
+                console.error('❌ Firebase DB no disponible');
+                return;
+            }
+            
+            // Intentar leer una colección
+            window.firebaseDB.collection('eventos').limit(1).get()
+                .then(snapshot => {
+                    console.log('✅ Conexión Firebase exitosa');
+                    console.log('📊 Eventos encontrados:', snapshot.size);
+                })
+                .catch(error => {
+                    console.error('❌ Error en conexión Firebase:', error);
+                });
+        }
+
+        function clearLogs() {
+            logsContainer.innerHTML = '';
+        }
+
+        // Cargar estado inicial
+        window.addEventListener('load', () => {
+            setTimeout(checkCurrentState, 1000);
+        });
+    </script>
+</body>
+</html> 

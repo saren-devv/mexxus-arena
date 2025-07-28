@@ -1,0 +1,71 @@
+{
+    "divisions": [
+      {
+        "name": "Pre Infantil",
+        "age_range": "4 a 5 años"
+      },
+      {
+        "name": "Infantil A",
+        "age_range": "6 a 7 años"
+      },
+      {
+        "name": "Infantil B",
+        "age_range": "8 a 9 años"
+      },
+      {
+        "name": "Pre Cadete",
+        "age_range": "10 a 11 años"
+      },
+      {
+        "name": "Cadete",
+        "age_range": "12 a 14 años"
+      },
+      {
+        "name": "Junior",
+        "age_range": "15 a 17 años"
+      },
+      {
+        "name": "Senior 1",
+        "age_range": "18 a 30 años"
+      },
+      {
+        "name": "Senior 2",
+        "age_range": "31 a 40 años"
+      },
+      {
+        "name": "Master 1",
+        "age_range": "41 a 50 años"
+      },
+      {
+        "name": "Master 2",
+        "age_range": "51 a 60 años"
+      },
+      {
+        "name": "Master 3",
+        "age_range": "61 años a más"
+      }
+    ],
+    "kibom_poomsae": {
+      "grade": "9no KUP",
+      "poomsae": "Kibom Poomsae"
+    },
+    "poomsaes": [
+      { "grade": "8vo KUP", "poomsae": "Il Jang" },
+      { "grade": "7mo KUP", "poomsae": "I Jang" },
+      { "grade": "6to KUP", "poomsae": "Sam Jang" },
+      { "grade": "5to KUP", "poomsae": "Sa Jang" },
+      { "grade": "4to KUP", "poomsae": "Oh Jang" },
+      { "grade": "3ero KUP", "poomsae": "Yuk Jang" },
+      { "grade": "2do KUP", "poomsae": "Chil Jang" },
+      { "grade": "1ero KUP", "poomsae": "Pal Jang" },
+      { "grade": "1er Poom / Dan", "poomsae": "Koryo" },
+      { "grade": "2do Poom / Dan", "poomsae": "Keumgang" },
+      { "grade": "3er Poom / Dan", "poomsae": "TaeBaeck" },
+      { "grade": "4to Dan", "poomsae": "Pyongwow" },
+      { "grade": "5to Dan", "poomsae": "Sip Jin" },
+      { "grade": "6to Dan", "poomsae": "Jitae" },
+      { "grade": "7mo Dan", "poomsae": "Chongkwon" },
+      { "grade": "8vo Dan", "poomsae": "Hansu" }
+    ]
+  }
+  
