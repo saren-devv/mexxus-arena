@@ -1,4 +1,4 @@
-# MEXXUS ARENA Beta 1.1 - Documentación Completa
+# MEXXUS ARENA Beta 1.1 - Documentación Completa Actualizada
 
 ## 📋 Descripción General
 
@@ -19,6 +19,8 @@
 - Panel de administrador avanzado
 - Interfaz responsive y moderna
 - Soporte para múltiples modalidades (KYORUGI y POOMSAE)
+- Importación masiva de atletas desde Excel
+- Sistema de categorización automática
 
 ---
 

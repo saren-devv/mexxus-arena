@@ -621,12 +621,9 @@ class FirebaseAuthManager {
                 if (this.currentUser.tipo === 'admin') {
                     userInfo.textContent = `${this.currentUser.nombre} (${this.currentUser.tipo})`;
                 } else {
-                    // Para academias: mostrar nombre completo y abreviatura entre paréntesis
-                    const nombreCompleto = this.currentUser.nombre || this.currentUser.abreviatura;
+                    // Para academias: mostrar solo la abreviatura
                     const abreviatura = this.currentUser.abreviatura;
-                    userInfo.textContent = abreviatura ? 
-                        `${nombreCompleto} (${abreviatura})` : 
-                        nombreCompleto;
+                    userInfo.textContent = abreviatura || 'Delegación';
                 }
             }
 
@@ -654,12 +651,9 @@ class FirebaseAuthManager {
                 if (this.currentUser.tipo === 'admin') {
                     userDisplayName = `${this.currentUser.nombre} (${this.currentUser.tipo})`;
                 } else {
-                    // Para academias: mostrar nombre completo y abreviatura entre paréntesis
-                    const nombreCompleto = this.currentUser.nombre || this.currentUser.abreviatura;
+                    // Para academias: mostrar solo la abreviatura
                     const abreviatura = this.currentUser.abreviatura;
-                    userDisplayName = abreviatura ? 
-                        `${nombreCompleto} (${abreviatura})` : 
-                        nombreCompleto;
+                    userDisplayName = abreviatura || 'Delegación';
                 }
                 window.mobileMenuManager.updateAuthState(true, userDisplayName);
             }
