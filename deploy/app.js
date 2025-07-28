@@ -189,6 +189,54 @@ class App {
         }
     }
 
+    // Función utilitaria para manejar estados de carga de botones
+    setButtonLoading(button, isLoading, loadingText = null) {
+        if (!button) return;
+        
+        if (isLoading) {
+            // Guardar el texto original si no se ha guardado
+            if (!button.hasAttribute('data-original-text')) {
+                button.setAttribute('data-original-text', button.innerHTML);
+            }
+            
+            if (loadingText) {
+                // Modo con texto de carga
+                button.classList.add('loading-text');
+                button.innerHTML = `
+                    <span class="loading-spinner"></span>
+                    ${loadingText}
+                `;
+            } else {
+                // Modo solo spinner
+                button.classList.add('loading');
+            }
+            
+            button.disabled = true;
+        } else {
+            // Restaurar estado original
+            button.classList.remove('loading', 'loading-text');
+            button.disabled = false;
+            
+            // Restaurar texto original
+            const originalText = button.getAttribute('data-original-text');
+            if (originalText) {
+                button.innerHTML = originalText;
+            }
+        }
+    }
+
+    // Función para prevenir múltiples clicks
+    preventMultipleClicks(button, callback, loadingText = null) {
+        if (!button || button.disabled) return;
+        
+        this.setButtonLoading(button, true, loadingText);
+        
+        // Ejecutar callback
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }
+
     // Cargar texto de bienvenida desde bienvenida.txt
     async loadWelcomeText() {
         try {
