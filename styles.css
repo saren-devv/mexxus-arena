@@ -959,7 +959,6 @@ main {
     font-size: 0.9rem;
     font-weight: 500;
     padding-bottom: var(--space-md);
-    border-bottom: 1px solid var(--color-gray-200);
 }
 
 .evento-ubicacion-principal .flag-icon {
