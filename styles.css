@@ -5794,11 +5794,21 @@ background: var(--color-bg-card, var(--color-white));
     #perfilDelegacion {
         margin: 1rem;
     }
+    
+    #perfilDelegacion .container {
+        padding: 0 1rem;
+        max-width: 100%;
+    }
 }
 
 @media (max-width: 480px) {
     #perfilDelegacion {
         margin: 0.5rem;
+    }
+    
+    #perfilDelegacion .container {
+        padding: 0 0.5rem;
+        max-width: 100%;
     }
 }
 
