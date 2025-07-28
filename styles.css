@@ -5790,6 +5790,18 @@ background: var(--color-bg-card, var(--color-white));
     margin: 2rem;
 }
 
+@media (max-width: 768px) {
+    #perfilDelegacion {
+        margin: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #perfilDelegacion {
+        margin: 0.5rem;
+    }
+}
+
 .participantes-tabla th{
 text-align: center;
 }
@@ -8851,6 +8863,9 @@ text-align: center;
     .form-container {
         padding: 1.5rem;
         margin-bottom: 1.5rem;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
     }
     
     .form-title {
@@ -8915,6 +8930,9 @@ text-align: center;
     .form-container {
         padding: 1rem;
         margin-bottom: 1rem;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
     }
     
     .form-title {
