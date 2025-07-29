@@ -272,7 +272,7 @@ class PublicEventsManager {
                     <div class="evento-ubicacion-principal">
                         ${evento.pais ? getCountryFlagHTML(evento.pais) : '<span class="flag-icon" style="font-size: 1.2em; margin-right: 8px;">🌍</span>'}
                         <span class="ubicacion-text">
-                            ${evento.pais ? evento.pais + ', ' : ''}${evento.ciudad || ''}
+                            ${evento.ciudad ? evento.ciudad + (evento.pais ? ', ' : '') : ''}${evento.pais || ''}
                         </span>
                     </div>
                     
@@ -509,7 +509,7 @@ class PublicEventsManager {
 
         const eventoLugar = document.getElementById('eventoLugarInscripcion');
         if (eventoLugar) {
-            eventoLugar.textContent = `${evento.lugar}${evento.pais || evento.ciudad ? ' - ' : ''}${evento.pais ? evento.pais + (evento.ciudad ? ', ' : '') : ''}${evento.ciudad || ''}`;
+            eventoLugar.textContent = `${evento.lugar}${evento.pais || evento.ciudad ? ' - ' : ''}${evento.ciudad ? evento.ciudad + (evento.pais ? ', ' : '') : ''}${evento.pais || ''}`;
         }
 
         // Actualizar bandera en el panel de inscripción
@@ -785,7 +785,22 @@ class PublicEventsManager {
         const eventoCiudad = document.getElementById('eventoCiudadDetalleAcademia');
         if (eventoCiudad) {
             // Usar el mismo formato que en el panel de inscripción
-            eventoCiudad.textContent = `${evento.lugar}${evento.pais || evento.ciudad ? ' - ' : ''}${evento.pais ? evento.pais + (evento.ciudad ? ', ' : '') : ''}${evento.ciudad || ''}`;
+            eventoCiudad.textContent = `${evento.lugar}${evento.pais || evento.ciudad ? ' - ' : ''}${evento.ciudad ? evento.ciudad + (evento.pais ? ', ' : '') : ''}${evento.pais || ''}`;
+        }
+
+        // Actualizar bandera en el panel de detalles de academia
+        const eventoBanderaDetalleAcademia = document.getElementById('eventoBanderaDetalleAcademia');
+        if (eventoBanderaDetalleAcademia) {
+            if (evento.pais) {
+                const countryCode = getCountryCode(evento.pais);
+                if (countryCode !== 'XX') {
+                    eventoBanderaDetalleAcademia.innerHTML = `<img src="https://flagcdn.com/w20/${countryCode.toLowerCase()}.png" alt="${evento.pais}" style="width: 20px; height: 15px; border-radius: 2px;">`;
+                } else {
+                    eventoBanderaDetalleAcademia.textContent = getCountryFlag(evento.pais);
+                }
+            } else {
+                eventoBanderaDetalleAcademia.textContent = '🌍';
+            }
         }
 
         // Actualizar estadísticas en el header
