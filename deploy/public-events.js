@@ -347,7 +347,7 @@ class PublicEventsManager {
             
             return `
                 <div class="bases-content">
-                    <h4>Bases del Evento</h4>
+                    <h4>Bases del Evento (Beta)</h4>
                     <div class="bases-disponibles">
                         <p>Las bases y reglamentos del evento están disponibles para descarga:</p>
                         <a href="${evento.basesPdf}" 
@@ -367,12 +367,12 @@ class PublicEventsManager {
         } else {
             return `
                 <div class="bases-content">
-                    <h4>Bases del Evento</h4>
+                    <h4>Bases del Evento (Beta)</h4>
                     <div class="bases-placeholder">
                         <svg class="icon icon-xl" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
                         </svg>
-                        <h5>Bases del Evento</h5>
+                        <h5>Bases del Evento (Beta)</h5>
                         <p>Las bases y reglamentos del evento se mostrarán aquí cuando estén disponibles.</p>
                     </div>
                 </div>

@@ -68,8 +68,16 @@ class FirebaseAdminManager {
         const crearEventoBtn = document.getElementById('crearEventoBtn');
         if (crearEventoBtn && !crearEventoBtn.hasAttribute('data-admin-listener')) {
             crearEventoBtn.setAttribute('data-admin-listener', 'true');
-            crearEventoBtn.addEventListener('click', () => {
-                window.eventsManager.openCreateEventoModal();
+            crearEventoBtn.addEventListener('click', async () => {
+                this.setButtonLoading(crearEventoBtn, true, 'Abriendo...');
+                try {
+                    await window.eventsManager.openCreateEventoModal();
+                } catch (error) {
+                    console.error('Error al abrir modal de crear evento:', error);
+                    window.authManager.showMessage('Error al abrir el modal de crear evento', 'error');
+                } finally {
+                    this.setButtonLoading(crearEventoBtn, false);
+                }
             });
         }
 
@@ -77,8 +85,16 @@ class FirebaseAdminManager {
         const crearEventoBtnQuick = document.getElementById('crearEventoBtnQuick');
         if (crearEventoBtnQuick && !crearEventoBtnQuick.hasAttribute('data-admin-listener')) {
             crearEventoBtnQuick.setAttribute('data-admin-listener', 'true');
-            crearEventoBtnQuick.addEventListener('click', () => {
-                window.eventsManager.openCreateEventoModal();
+            crearEventoBtnQuick.addEventListener('click', async () => {
+                this.setButtonLoading(crearEventoBtnQuick, true, 'Abriendo...');
+                try {
+                    await window.eventsManager.openCreateEventoModal();
+                } catch (error) {
+                    console.error('Error al abrir modal de crear evento:', error);
+                    window.authManager.showMessage('Error al abrir el modal de crear evento', 'error');
+                } finally {
+                    this.setButtonLoading(crearEventoBtnQuick, false);
+                }
             });
         }
 
@@ -112,6 +128,42 @@ class FirebaseAdminManager {
         
         // Marcar que los event listeners ya están configurados
         this.eventListenersConfigured = true;
+    }
+
+    // Función utilitaria para manejar estados de carga de botones
+    setButtonLoading(button, isLoading, loadingText = null) {
+        if (!button) return;
+        
+        if (isLoading) {
+            // Guardar el texto original si no se ha guardado
+            if (!button.hasAttribute('data-original-text')) {
+                button.setAttribute('data-original-text', button.innerHTML);
+            }
+            
+            if (loadingText) {
+                // Modo con texto de carga
+                button.classList.add('loading-text');
+                button.innerHTML = `
+                    <span class="loading-spinner"></span>
+                    ${loadingText}
+                `;
+            } else {
+                // Modo solo spinner
+                button.classList.add('loading');
+            }
+            
+            button.disabled = true;
+        } else {
+            // Restaurar estado original
+            button.classList.remove('loading', 'loading-text');
+            button.disabled = false;
+            
+            // Restaurar texto original
+            const originalText = button.getAttribute('data-original-text');
+            if (originalText) {
+                button.innerHTML = originalText;
+            }
+        }
     }
 
     switchEventoDetallesTab(tabName) {
